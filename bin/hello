@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Resolve symlinks so this works when linked from elsewhere (e.g. ~/.local/bin/hello).
+# Resolve symlinks so this works when linked from elsewhere (e.g. ~/.bin/hello).
+# This must stay in the launcher: it is what locates shell/_common.sh.
 SOURCE="${BASH_SOURCE[0]}"
 while [ -L "$SOURCE" ]; do
   DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
   SOURCE="$(readlink "$SOURCE")"
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
 done
-BIN_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
-# shellcheck source=../shell/common.sh
-source "$BIN_DIR/../shell/common.sh"
+# shellcheck source=../shell/_common.sh
+source "$(cd -P "$(dirname "$SOURCE")" && pwd)/../shell/_common.sh"
 
 run_tool hello "$@"

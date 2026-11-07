@@ -1,10 +1,26 @@
-# Shared logic for all bin scripts. Sourced (not executed) by each `bin/<tool>` file.
-# Expects BIN_DIR to be set by the caller (the real, symlink-resolved bin directory).
+# Shared logic for all bin scripts. A library: sourced (never executed) by each `bin/<tool>` launcher.
+# Needs nothing from the caller; it locates the repo from its own path.
 
-REPO_ROOT="$(cd -P "$BIN_DIR/.." && pwd)"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  printf '_common.sh: this file is a library and must be sourced, not executed.\n' >&2
+  exit 1
+fi
+
+REPO_ROOT="$(cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TSX="$REPO_ROOT/node_modules/.bin/tsx"
 
 _err() { printf 'cli-tools: %s\n' "$*" >&2; }
+
+# Usage: require_command <command> [hint]
+# Fails with an actionable message when <command> is not on PATH.
+require_command() {
+  local cmd="$1" hint="${2:-}"
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    _err "'$cmd' was not found on your PATH."
+    [ -n "$hint" ] && _err "$hint"
+    exit 1
+  fi
+}
 
 # Verifies prerequisites, printing helpful guidance on failure.
 _preflight() {
@@ -24,11 +40,11 @@ _preflight() {
 }
 
 # Usage: run_tool <name> [args...]
-# Runs src/commands/<name>.ts through the repo-local tsx.
+# Runs src/tools/<name>.ts through the repo-local tsx.
 run_tool() {
   local name="$1"
   shift
-  local entry="$REPO_ROOT/src/commands/$name.ts"
+  local entry="$REPO_ROOT/src/tools/$name.ts"
 
   _preflight || exit 1
 

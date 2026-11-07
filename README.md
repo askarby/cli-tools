@@ -5,8 +5,8 @@ TypeScript CLI tools for my development machines. Commands run directly with [ts
 ## Layout
 
 - `bin/` — one executable bash launcher per command (only executables live here)
-- `shell/common.sh` — shared bash logic every launcher sources
-- `src/commands/` — one TypeScript file per command
+- `shell/_common.sh` — shared bash library every launcher sources (not runnable on its own)
+- `src/tools/` — one TypeScript entrypoint per tool
 - `src/lib/` — shared code
 
 ## Install
@@ -21,9 +21,24 @@ If you run a launcher before installing dependencies, it tells you what to do.
 
 ## Adding a command
 
-1. Create `src/commands/<name>.ts`.
+1. Create `src/tools/<name>.ts`.
 2. Copy `bin/hello` to `bin/<name>` and change the last line to `run_tool <name> "$@"`.
 3. `chmod +x bin/<name>`.
+
+## herdrinator
+
+tmuxinator-style workspaces for [herdr](https://herdr.dev). Workspace files use the tmuxinator YAML format (windows become tabs, panes become splits).
+
+    herdrinator setup          # create ~/.config/herdrinator/herdrinatorrc.toml + example bob.yml
+    herdrinator new bob        # new commented workspace file (alias: init)
+    herdrinator start bob      # build the workspace (focuses it if already running)
+    herdrinator list           # RUNNING / CLOSED / UNMANAGED overview
+    herdrinator stop bob       # close it
+    herdrinator doctor         # sanity-check herdr, config and workspace files
+    herdrinator action w "CLI Tools"                    # script helpers: create a workspace
+    herdrinator action t "claude ." --name "Claude"     # ... and add a tab to the active one
+
+Run `herdrinator` without arguments for the full usage guide. `start --dry-run` prints the herdr calls without running them. Supported YAML keys: `name`, `root`, `windows` (with `layout`, `root`, `pre`, `panes`), `pre`, `pre_window`, `on_project_start`, `startup_window`; anything else produces a warning. A workspace counts as running when a herdr workspace has the same label as its `name`.
 
 ## Scripts
 

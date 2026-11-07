@@ -30,7 +30,7 @@ export const log = (message: string): void => {
 
 ## Command pattern
 
-Each command is a top-level script in `src/commands/<name>.ts`, with no exported API. Parse arguments with `node:util` `parseArgs` (no CLI framework), print with `log`, and fail with `fail`:
+Each tool is a top-level script in `src/tools/<name>.ts`, with no exported API. Parse arguments with `node:util` `parseArgs` for simple single-purpose commands; commands with subcommands (e.g. `herdrinator`) use `commander`, one module per subcommand exporting `register(program)`. Print with `log`, and fail with `fail`:
 
 ```ts
 import { parseArgs } from "node:util";
@@ -56,4 +56,4 @@ npm run typecheck && npm run lint
 npm run format
 ```
 
-There is no test framework. Run the command by hand (`npx tsx src/commands/<name>.ts ...`) to check behaviour.
+There is no test framework. Run the command by hand (`npx tsx src/tools/<name>.ts ...`) to check behaviour.
