@@ -52,8 +52,8 @@ log(`Hello, ${values.name}!`);
 ## Before finishing
 
 ```
-npm run typecheck && npm run lint
+npm run typecheck && npm run lint && npm test
 npm run format
 ```
 
-There is no test framework. Run the command by hand (`npx tsx src/tools/<name>.ts ...`) to check behaviour.
+Write tests as described in the `testing` skill, and read the `safety` skill before any code that deletes or executes. Also run the command by hand (`npx tsx src/tools/<name>.ts ...`) to check behaviour.

@@ -25,6 +25,13 @@ If you run a launcher before installing dependencies, it tells you what to do.
 2. Copy `bin/hello` to `bin/<name>` and change the last line to `run_tool <name> "$@"`.
 3. `chmod +x bin/<name>`.
 
+## Testing
+
+    npm test            # vitest run
+    npm run test:watch
+
+Tests live next to the code as `*.test.ts` and run in temp sandboxes, never against your real config.
+
 ## herdrinator
 
 tmuxinator-style workspaces for [herdr](https://herdr.dev). Workspace files use the tmuxinator YAML format (windows become tabs, panes become splits).

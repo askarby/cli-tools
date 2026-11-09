@@ -43,6 +43,7 @@ The resolve loop is the only part that cannot move into `_common.sh` (it is what
 - Check for tools with `command -v x >/dev/null 2>&1`, and give the user an actionable message (what's missing and what to run).
 - Add `# shellcheck source=...` directives above `source` lines.
 - Use `printf` rather than `echo` for formatted output.
+- Anything that could delete or overwrite: read the `safety` skill first.
 
 ## Installer rules (`install.sh`)
 
