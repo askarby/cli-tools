@@ -19,9 +19,11 @@ export const register = (program: Command): void => {
           "No editor configured",
           "Set `editor` in herdrinatorrc.toml or export $EDITOR",
         );
-      spawnSync(`${editor} "${file.replaceAll('"', '\\"')}"`, {
+      // The path travels in an env var, so the shell never parses it.
+      spawnSync(`${editor} "$HERDRINATOR_FILE"`, {
         shell: true,
         stdio: "inherit",
+        env: { ...process.env, HERDRINATOR_FILE: file },
       });
     });
 };

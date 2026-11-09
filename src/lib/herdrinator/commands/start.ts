@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
 import { buildWorkspace } from "../runner.ts";
@@ -11,7 +12,7 @@ interface Options {
   force: boolean;
 }
 
-export const register = (program: Command): void => {
+export const register = (program: Command, deps: Deps): void => {
   program
     .command("start")
     .description("🚀 Start a workspace from its configuration file")
@@ -24,7 +25,7 @@ export const register = (program: Command): void => {
       const spec = loadWorkspace(findWorkspaceFile(rc, name));
       for (const message of spec.warnings) warn(`${spec.id}: ${message}`);
 
-      const herdr = new Herdr(options.dryRun);
+      const herdr = new Herdr(options.dryRun, deps.exec);
       const running = herdr
         .listWorkspaces()
         .find((workspace) => workspace.label === spec.name);

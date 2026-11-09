@@ -1,6 +1,6 @@
-import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import type { Command } from "commander";
+import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { rcPath } from "../paths.ts";
 import { loadRc } from "../rc.ts";
@@ -17,21 +17,17 @@ const attempt = (fn: () => string): Check => {
   }
 };
 
-export const register = (program: Command): void => {
+export const register = (program: Command, deps: Deps): void => {
   program
     .command("doctor")
     .description("🩺 Check herdr, configuration and workspace files")
     .action(() => {
       const checks: Check[] = [];
-      checks.push(
-        attempt(() =>
-          execFileSync("herdr", ["--version"], { encoding: "utf8" }).trim(),
-        ),
-      );
+      checks.push(attempt(() => deps.exec(["--version"]).trim()));
       checks.push(
         attempt(
           () =>
-            `herdr server reachable (${new Herdr().listWorkspaces().length} workspaces)`,
+            `herdr server reachable (${new Herdr(false, deps.exec).listWorkspaces().length} workspaces)`,
         ),
       );
       checks.push(

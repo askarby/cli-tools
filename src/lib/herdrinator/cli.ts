@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { CliError } from "./errors.ts";
+import { execHerdr, type Exec } from "./herdr.ts";
 import { c, say } from "./ui.ts";
 import { register as action } from "./commands/action.ts";
 import { register as doctor } from "./commands/doctor.ts";
@@ -20,7 +21,7 @@ ${c.bold("Examples:")}
   herdrinator action t "claude ." --name Claude  ${c.gray("script: add a tab to the active workspace")}
 `;
 
-const REGISTRARS = [
+const REGISTRARS: ((program: Command, deps: Deps) => void)[] = [
   start,
   newWorkspace,
   setup,
@@ -31,7 +32,15 @@ const REGISTRARS = [
   action,
 ];
 
-export const buildProgram = (): Command => {
+/** Everything with side effects outside the filesystem, injectable for tests. */
+export interface Deps {
+  /** Runs `herdr <args>`; defaults to the real binary. */
+  exec: Exec;
+}
+
+export const defaultDeps: Deps = { exec: execHerdr };
+
+export const buildProgram = (deps: Deps = defaultDeps): Command => {
   const program = new Command("herdrinator")
     .description("🐑 tmuxinator-style workspaces for herdr")
     .helpOption("-h, --help", "show this help")
@@ -45,13 +54,16 @@ export const buildProgram = (): Command => {
     })
     .addHelpText("after", EXAMPLES)
     .exitOverride();
-  for (const register of REGISTRARS) register(program);
+  for (const register of REGISTRARS) register(program, deps);
   return program;
 };
 
-export const run = async (argv: string[]): Promise<void> => {
+export const run = async (
+  argv: string[],
+  deps: Deps = defaultDeps,
+): Promise<void> => {
   const args = argv.map((arg) => (arg === "-?" ? "--help" : arg));
-  const program = buildProgram();
+  const program = buildProgram(deps);
   if (args.length === 0) {
     program.outputHelp();
     return;

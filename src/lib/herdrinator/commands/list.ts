@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
 import { c, hint, say, table } from "../ui.ts";
@@ -11,7 +12,7 @@ const STATUS = {
   invalid: `🔴 ${c.red("INVALID")}`,
 };
 
-export const register = (program: Command): void => {
+export const register = (program: Command, deps: Deps): void => {
   program
     .command("list")
     .alias("ls")
@@ -19,7 +20,7 @@ export const register = (program: Command): void => {
     .action(() => {
       const rc = loadRc();
       const live = new Map(
-        new Herdr()
+        new Herdr(false, deps.exec)
           .listWorkspaces()
           .map((workspace) => [workspace.label, workspace]),
       );

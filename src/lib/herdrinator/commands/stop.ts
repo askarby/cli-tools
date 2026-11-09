@@ -1,11 +1,12 @@
 import type { Command } from "commander";
+import type { Deps } from "../cli.ts";
 import { CliError } from "../errors.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
 import { c, say } from "../ui.ts";
 import { listWorkspaceFiles, loadWorkspace } from "../workspace.ts";
 
-export const register = (program: Command): void => {
+export const register = (program: Command, deps: Deps): void => {
   program
     .command("stop")
     .description("🛑 Close a running workspace")
@@ -16,7 +17,7 @@ export const register = (program: Command): void => {
       );
       const label = entry ? loadWorkspace(entry.file).name : name;
 
-      const herdr = new Herdr();
+      const herdr = new Herdr(false, deps.exec);
       const running = herdr
         .listWorkspaces()
         .find((workspace) => workspace.label === label);

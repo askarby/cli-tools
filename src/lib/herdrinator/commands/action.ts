@@ -1,5 +1,6 @@
 import { basename } from "node:path";
 import type { Command } from "commander";
+import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { c, say } from "../ui.ts";
 
@@ -7,7 +8,7 @@ import { c, say } from "../ui.ts";
 const nameFromCommand = (command: string): string =>
   basename(command.trim().split(/\s+/)[0] ?? command) || command;
 
-export const register = (program: Command): void => {
+export const register = (program: Command, deps: Deps): void => {
   const action = program
     .command("action")
     .description("🎬 Building blocks for scripts running inside herdr");
@@ -19,7 +20,7 @@ export const register = (program: Command): void => {
     .argument("<name>", "workspace label")
     .option("--cwd <path>", "working directory", process.cwd())
     .action((name: string, options: { cwd: string }) => {
-      const herdr = new Herdr();
+      const herdr = new Herdr(false, deps.exec);
       const created = herdr.createWorkspace(name, options.cwd);
       herdr.focusWorkspace(created.workspace.workspace_id);
       say(`📂 Workspace ${c.bold(name)} created`);
@@ -33,7 +34,7 @@ export const register = (program: Command): void => {
     .option("--name <name>", "tab name (default: derived from the command)")
     .option("--cwd <path>", "working directory", process.cwd())
     .action((command: string, options: { name?: string; cwd: string }) => {
-      const herdr = new Herdr();
+      const herdr = new Herdr(false, deps.exec);
       const name = options.name ?? nameFromCommand(command);
       const created = herdr.createTab(
         herdr.currentWorkspaceId(),

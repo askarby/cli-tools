@@ -16,10 +16,10 @@ export const register = (program: Command): void => {
     )
     .argument("<name>", "workspace file name, without extension")
     .action((name: string) => {
-      if (!/^[\w.-]+$/.test(name))
+      if (!/^\w[\w.-]*$/.test(name))
         throw new CliError(
           `'${name}' is not a valid workspace name`,
-          "Use letters, digits, '-', '_' and '.'",
+          "Start with a letter, digit or '_'; then use letters, digits, '-', '_' and '.'",
         );
       const rc = loadRc();
       const existing = listWorkspaceFiles(rc).find(

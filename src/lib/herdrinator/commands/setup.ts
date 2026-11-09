@@ -25,7 +25,7 @@ export const register = (program: Command): void => {
       const workspaces = defaultWorkspacesDir();
       writeOnce(
         rcPath(),
-        rcTemplate(workspaces.replace(process.env["HOME"] ?? "\0", "~")),
+        rcTemplate(workspaces.replace(process.env["HOME"] || "\0", "~")),
       );
       writeOnce(join(workspaces, "bob.yml"), exampleWorkspace("bob"));
       hint("Try it out: herdrinator start bob --dry-run");

@@ -32,21 +32,29 @@ interface Envelope<T> {
   result: T;
 }
 
+/** Runs `herdr <args>` and returns stdout; throws the raw child-process error on failure. */
+export type Exec = (args: string[]) => string;
+
+export const execHerdr: Exec = (args) =>
+  execFileSync("herdr", args, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
 /** Typed wrapper over the `herdr` CLI. With `dryRun`, mutating calls are printed and faked. */
 export class Herdr {
   readonly dryRun: boolean;
+  readonly #run: Exec;
   #fakeIds = 0;
 
-  constructor(dryRun = false) {
+  constructor(dryRun = false, exec: Exec = execHerdr) {
     this.dryRun = dryRun;
+    this.#run = exec;
   }
 
   #exec(args: string[]): string {
     try {
-      return execFileSync("herdr", args, {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      });
+      return this.#run(args);
     } catch (error) {
       const err = error as NodeJS.ErrnoException & { stderr?: string };
       if (err.code === "ENOENT") {
