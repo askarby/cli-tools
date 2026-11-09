@@ -11,10 +11,27 @@ TSX="$REPO_ROOT/node_modules/.bin/tsx"
 
 _err() { printf 'cli-tools: %s\n' "$*" >&2; }
 
+# Detect a help request from the launcher's arguments. A file that is sourced without arguments
+# sees the sourcing script's positional parameters, so launchers need no extra wiring.
+# Help must work without a tool's prerequisites (e.g. in CI), so require_command skips on it.
+_HELP_REQUESTED=0
+for _arg in "$@"; do
+  case "$_arg" in
+    --) break ;;
+    -h | --help | '-?')
+      _HELP_REQUESTED=1
+      break
+      ;;
+  esac
+done
+unset _arg
+
 # Usage: require_command <command> [hint]
 # Fails with an actionable message when <command> is not on PATH.
+# Does nothing when help was requested, so `--help` works without the prerequisite installed.
 require_command() {
   local cmd="$1" hint="${2:-}"
+  [ "$_HELP_REQUESTED" = 1 ] && return 0
   if ! command -v "$cmd" >/dev/null 2>&1; then
     _err "'$cmd' was not found on your PATH."
     [ -n "$hint" ] && _err "$hint"

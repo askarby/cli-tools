@@ -27,7 +27,7 @@ The name passed to `run_tool` must match the file name in `src/tools/`.
 ## Adding a command
 
 1. Create `src/tools/<name>.ts` (see the `typescript` skill).
-2. Copy `bin/hello` to `bin/<name>` (add `require_command <tool> <hint>` before `run_tool` if the command needs an external tool) and change the last line to `run_tool <name> "$@"`.
+2. Copy `bin/hello` to `bin/<name>` (add `require_command <tool> <hint>` before `run_tool` if the command needs an external tool; the check is skipped for `--help`, so the tool must handle `--help` itself) and change the last line to `run_tool <name> "$@"`.
 3. `chmod +x bin/<name>`.
 4. Add tests next to the lib code (`testing` skill).
 5. Run `npm run typecheck && npm run lint && npm test`.

@@ -48,6 +48,17 @@ describe("bin/herdrinator", () => {
     expect(readFileSync(callLog, "utf8")).toContain("workspace list");
   }, 20_000);
 
+  it.each([["--help"], ["-h"], ["workspace", "--help"]])(
+    "shows help without herdr installed: %s",
+    (...args) => {
+      const result = launch(args, withNode());
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain("Usage:");
+      expect(result.stderr).not.toContain("not found on your PATH");
+    },
+    20_000,
+  );
+
   it("fails with guidance when herdr is not installed", () => {
     const result = launch(["list"], "/usr/bin:/bin");
     expect(result.status).toBe(1);

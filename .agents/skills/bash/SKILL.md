@@ -33,6 +33,8 @@ require_command herdr "Install herdr first (https://herdr.dev), then try again."
 run_tool <name> "$@"
 ```
 
+`require_command` is a no-op when the launcher's arguments contain `-h`, `--help` or `-?` (detected in `_common.sh` at source time), so help works without a tool's prerequisites installed (CI relies on this). Every tool must therefore handle `--help` in TypeScript without needing the external tool.
+
 The resolve loop is the only part that cannot move into `_common.sh` (it is what finds it). `_common.sh` finds the repo from its own path, so launchers set no `BIN_DIR`. Don't put real logic in launchers; put shared behaviour in `shell/_common.sh` and real work in TypeScript.
 
 ## Style
