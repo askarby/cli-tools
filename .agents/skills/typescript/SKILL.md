@@ -8,7 +8,7 @@ description: TypeScript conventions for cli-tools (ESM, strict, tsx, Prettier, E
 ## Module system
 
 - ESM only (`"type": "module"`). No `require`, no CommonJS.
-- Import local files **with the `.ts` extension**: `import { log } from "../lib/log.ts";` (`allowImportingTsExtensions` is on).
+- Import local files **with the `.ts` extension**: `import { log } from "../lib/shared/log.ts";` (`allowImportingTsExtensions` is on).
 - Import Node built-ins with the `node:` prefix: `node:util`, `node:fs`, `node:path`.
 - `verbatimModuleSyntax` is on: use `import type { ... }` for type-only imports.
 
@@ -34,7 +34,7 @@ Each tool is a top-level script in `src/tools/<name>.ts`, with no exported API. 
 
 ```ts
 import { parseArgs } from "node:util";
-import { fail, log } from "../lib/log.ts";
+import { fail, log } from "../lib/shared/log.ts";
 
 const { values } = parseArgs({
   options: { name: { type: "string", short: "n", default: "world" } },

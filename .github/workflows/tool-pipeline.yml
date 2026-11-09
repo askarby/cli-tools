@@ -1,0 +1,83 @@
+# Reusable pipeline for a single tool: format -> lint -> typecheck -> test -> build.
+# Called once per tool from ci.yml so the chain is defined in one place.
+name: Tool pipeline
+
+on:
+  workflow_call:
+    inputs:
+      tool:
+        description: Tool name (bin/<tool>)
+        type: string
+        required: true
+      lint-paths:
+        description: Space-separated paths to lint
+        type: string
+        required: true
+      format-paths:
+        description: Space-separated paths for the prettier check; defaults to lint-paths
+        type: string
+        default: ""
+      test-paths:
+        description: Space-separated vitest paths; empty skips the test job
+        type: string
+        default: ""
+      smoke-args:
+        description: Arguments for the launcher smoke run in the build job
+        type: string
+        default: ""
+      run-build:
+        description: Run the launcher smoke run (set false for non-tool groups)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    name: ${{ inputs.tool }} / format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: npx prettier --check ${{ inputs.format-paths || inputs.lint-paths }}
+
+  lint:
+    name: ${{ inputs.tool }} / lint
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: npx eslint ${{ inputs.lint-paths }}
+
+  typecheck:
+    name: ${{ inputs.tool }} / typecheck
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: npm run typecheck
+
+  test:
+    name: ${{ inputs.tool }} / test
+    if: inputs.test-paths != ''
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: npx vitest run ${{ inputs.test-paths }}
+
+  build:
+    name: ${{ inputs.tool }} / build
+    # Run even when the test job is skipped (no tests), but not if anything failed.
+    needs: [typecheck, test]
+    if: ${{ inputs.run-build && !cancelled() && needs.typecheck.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # No compile step (tsx runs the TS directly); smoke-run the real launcher.
+      - run: ./bin/${{ inputs.tool }} ${{ inputs.smoke-args }}

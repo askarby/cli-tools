@@ -5,7 +5,7 @@ description: How to test cli-tools commands and library code with Vitest (unit, 
 
 # Testing
 
-Reference implementations: `src/lib/herdrinator/paths.test.ts` (env stubbing), `src/lib/safety.test.ts` (filesystem sandbox, destructive-code cases), `src/lib/test-utils.ts` (`createSandbox`).
+Reference implementations: `src/lib/herdrinator/paths.test.ts` (env stubbing), `src/lib/shared/safety.test.ts` (filesystem sandbox, destructive-code cases), `src/lib/shared/test-utils.ts` (`createSandbox`).
 
 ## Runner and layout
 
@@ -34,7 +34,7 @@ For every command, cover: the happy path, each validation error and its exit cod
 - **Never touch the real machine.** No real `~/.config`, `~/.bin`, repo files, or real `herdr`. A test that needs files uses a sandbox:
 
   ```ts
-  import { createSandbox, type Sandbox } from "../test-utils.ts";
+  import { createSandbox, type Sandbox } from "../shared/test-utils.ts";
 
   let sandbox: Sandbox;
   beforeEach(() => {

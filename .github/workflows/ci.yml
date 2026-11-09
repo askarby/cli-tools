@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  hello:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: hello
+      lint-paths: src/tools/hello.ts
+      # No tests for hello yet; the test job is skipped.
+
+  herdrinator:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: herdrinator
+      lint-paths: src/tools/herdrinator.ts src/lib/herdrinator
+      test-paths: src/lib/herdrinator
+      smoke-args: --help
+
+  shared:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: shared
+      lint-paths: src/lib/shared
+      test-paths: src/lib/shared
+      run-build: false

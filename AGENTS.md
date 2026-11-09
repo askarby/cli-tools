@@ -10,15 +10,16 @@ TypeScript CLI tools for personal development machines. Each command is a TypeSc
 
 ## Commands
 
-| Command             | Purpose                                        |
-| ------------------- | ---------------------------------------------- |
-| `npm run typecheck` | `tsc --noEmit` (covers `src/` only)            |
-| `npm run lint`      | `eslint .`                                     |
-| `npm run format`    | `prettier --write .`                           |
-| `npm test`          | `vitest run` (`npm run test:watch` to watch)   |
-| `./install.sh`      | Install deps and symlink `bin/*` into `~/.bin` |
+| Command                | Purpose                                        |
+| ---------------------- | ---------------------------------------------- |
+| `npm run typecheck`    | `tsc --noEmit` (covers `src/` only)            |
+| `npm run lint`         | `eslint .`                                     |
+| `npm run format`       | `prettier --write .`                           |
+| `npm run format:check` | `prettier --check .` (used by CI)              |
+| `npm test`             | `vitest run` (`npm run test:watch` to watch)   |
+| `./install.sh`         | Install deps and symlink `bin/*` into `~/.bin` |
 
-There is no CI. Verification is typecheck + lint + tests (+ running the command by hand).
+CI (`.github/workflows/ci.yml`) runs one parallel pipeline per tool: format -> lint -> typecheck -> test -> build (launcher smoke run), defined once in `tool-pipeline.yml`. Locally, verification is format:check + typecheck + lint + tests (+ running the command by hand).
 
 ## Layout
 
@@ -26,7 +27,8 @@ There is no CI. Verification is typecheck + lint + tests (+ running the command 
 bin/<name>             executable bash launcher (only executables live here)
 shell/_common.sh        shared launcher logic (sourced, not executed)
 src/tools/<name>.ts one TypeScript entrypoint per tool
-src/lib/               shared TypeScript code (tests sit beside it as *.test.ts)
+src/lib/<name>/        per-tool code; src/lib/shared/ holds code used by several tools
+                       (tests sit beside the code as *.test.ts)
 install.sh             idempotent installer; never deletes anything
 ```
 
@@ -45,7 +47,7 @@ Task-specific guidance lives in `.agents/skills/<name>/SKILL.md`. Read the relev
 - Before finishing a change, run `npm run typecheck`, `npm run lint` and `npm test`. New commands and lib code come with tests.
 - Don't add runtime dependencies without asking. Prefer Node built-ins (e.g. `node:util` `parseArgs` for simple commands).
 - Never make `install.sh` or any launcher delete user files; report and suggest instead.
-- All file deletion in TypeScript goes through `safeRemove` in `src/lib/safety.ts`; never call `rmSync`/`unlink` directly. Read the `safety` skill first.
+- All file deletion in TypeScript goes through `safeRemove` in `src/lib/shared/safety.ts`; never call `rmSync`/`unlink` directly. Read the `safety` skill first.
 - Tests never touch the real home, config or `~/.bin`, and never run the real `herdr`; use `createSandbox()` and fakes (see `testing`).
 - Keep `bin/` to executables only.
 - Don't commit unless asked.

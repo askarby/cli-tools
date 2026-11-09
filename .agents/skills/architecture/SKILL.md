@@ -11,7 +11,7 @@ description: How the cli-tools repository is structured and how a command runs f
 bin/<name>              bash launcher, one per command (executables only)
 shell/_common.sh        shared launcher logic, sourced by every launcher (guarded: errors if executed)
 src/tools/<name>.ts  TypeScript entrypoint, one per tool
-src/lib/                shared TypeScript code (e.g. log.ts: log, fail; safety.ts: safeRemove)
+src/lib/                per-tool code in src/lib/<tool>/; src/lib/shared/ is cross-tool (log.ts: log, fail; safety.ts: safeRemove; test-utils.ts)
 src/**/*.test.ts        Vitest tests, next to the code they test (see the `testing` skill)
 install.sh              installs deps, symlinks bin/* into ~/.bin
 ```
@@ -33,7 +33,7 @@ The name passed to `run_tool` must match the file name in `src/tools/`.
 5. Run `npm run typecheck && npm run lint && npm test`.
 6. Run `./install.sh` to link it into `~/.bin`, then try the command.
 
-Put code used by more than one command in `src/lib/`, not in a tool file. Put launcher logic shared by all commands in `shell/_common.sh`, not in individual launchers.
+Put code used by more than one command in `src/lib/shared/`, not in a tool file. Put launcher logic shared by all commands in `shell/_common.sh`, not in individual launchers.
 
 ## Design decisions (keep these)
 

@@ -1,0 +1,12 @@
+name: Setup
+description: Checkout, install Node (version from .tool-versions) and npm dependencies
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: .tool-versions
+        cache: npm
+    - run: npm ci
+      shell: bash

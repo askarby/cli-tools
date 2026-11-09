@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSandbox, type Sandbox } from "../../test-utils.ts";
+import { createSandbox, type Sandbox } from "../../shared/test-utils.ts";
 import { run } from "../cli.ts";
 import { configDir, defaultWorkspacesDir } from "../paths.ts";
 

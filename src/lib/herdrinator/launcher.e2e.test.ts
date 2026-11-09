@@ -2,7 +2,7 @@ import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createSandbox, type Sandbox } from "../test-utils.ts";
+import { createSandbox, type Sandbox } from "../shared/test-utils.ts";
 
 // Slow smoke tests: prove bin/ launcher -> tsx -> entrypoint wiring only.
 // The child gets a sandboxed HOME / XDG_CONFIG_HOME and a stub `herdr`; nothing real is touched.

@@ -5,7 +5,7 @@ description: Safety rules for code that deletes, overwrites, moves or executes t
 
 # Safety for destructive code
 
-Reference implementation: `src/lib/safety.ts` (`safeRemove`) and its tests in `src/lib/safety.test.ts`.
+Reference implementation: `src/lib/shared/safety.ts` (`safeRemove`) and its tests in `src/lib/shared/safety.test.ts`.
 
 ## Principles
 
@@ -16,7 +16,7 @@ Reference implementation: `src/lib/safety.ts` (`safeRemove`) and its tests in `s
 
 ## The one way to delete in TypeScript
 
-All deletion goes through `safeRemove(target, { root, dryRun?, maxEntries? })` from `src/lib/safety.ts`. Direct `rmSync`, `rm`, `unlink`, `rmdir` or `fs.promises.rm` outside `safety.ts` and `test-utils.ts` is a review failure. `safeRemove` refuses (throws `SafetyError`, removes nothing) unless:
+All deletion goes through `safeRemove(target, { root, dryRun?, maxEntries? })` from `src/lib/shared/safety.ts`. Direct `rmSync`, `rm`, `unlink`, `rmdir` or `fs.promises.rm` outside `safety.ts` and `test-utils.ts` is a review failure. `safeRemove` refuses (throws `SafetyError`, removes nothing) unless:
 
 - the target is non-empty and exists;
 - after `realpath` (so `..` and symlinked parents can't escape), the target is **strictly inside** `root`; the root itself is refused;

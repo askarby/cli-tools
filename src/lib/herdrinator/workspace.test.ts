@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSandbox, type Sandbox } from "../test-utils.ts";
+import { createSandbox, type Sandbox } from "../shared/test-utils.ts";
 import { CliError } from "./errors.ts";
 import type { Rc } from "./rc.ts";
 import {
