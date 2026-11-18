@@ -47,7 +47,7 @@ export const defaultDeps: Deps = {
 
 const spec: CliSpec<Deps> = {
   name: "__NAME__",
-  description: "🛠️  __NAME__",
+  description: "__NAME__",
   helpText: EXAMPLES,
   registrars: [hello],
 };
@@ -66,7 +66,7 @@ import { ok } from "../../shared/ui.ts";
 export const register = (program: Command): void => {
   program
     .command("hello")
-    .description("👋 Say hello (example command)")
+    .description("Say hello (example command)")
     .argument("[name]", "who to greet", "world")
     .action((name: string) => {
       ok("Hello, " + name + "!");

@@ -16,7 +16,7 @@ export const register = (program: Command, deps: Deps): void => {
   program
     .command("list")
     .alias("ls")
-    .description("📋 List workspaces and whether they are running in herdr")
+    .description("List workspaces and whether they are running in herdr")
     .action(() => {
       const rc = loadRc();
       const live = new Map(

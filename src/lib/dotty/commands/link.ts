@@ -16,7 +16,7 @@ interface Opts {
 export const register = (program: Command): void => {
   program
     .command("link")
-    .description("🔗 Symlink packages from the repo into the target")
+    .description("Symlink packages from the repo into the target")
     .argument("[packages...]", "packages to link")
     .option("-a, --all", "link every package")
     .option("-n, --dry-run", "show what would happen, change nothing")

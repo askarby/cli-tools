@@ -35,7 +35,7 @@ export const register = (program: Command): void => {
   program
     .command("list")
     .alias("ls")
-    .description("📋 Show which packages are linked")
+    .description("Show which packages are linked")
     .action(() => {
       const config = loadConfig();
       const pkgs = listPackages(config);

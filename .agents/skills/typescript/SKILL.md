@@ -28,6 +28,8 @@ export const log = (message: string): void => {
 };
 ```
 
+Command documentation (`.description(...)`, help text) is plain text with no emojis; emojis are only for runtime output via `ui.ts`.
+
 ## Command pattern
 
 Each tool is a top-level script in `src/tools/<name>.ts`, with no exported API. Parse arguments with `node:util` `parseArgs` for simple single-purpose commands; commands with subcommands (e.g. `herdrinator`) use `commander` through `src/lib/shared/cli.ts` (`CliSpec` + `runCli`; see the `new-tool` skill), one module per subcommand exporting `register(program, deps)`. Print with `log`, and fail with `fail`:

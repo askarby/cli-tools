@@ -9,7 +9,7 @@ import { listWorkspaceFiles, loadWorkspace } from "../workspace.ts";
 export const register = (program: Command, deps: Deps): void => {
   program
     .command("stop")
-    .description("🛑 Close a running workspace")
+    .description("Close a running workspace")
     .argument("<name>", "workspace file name (or the herdr workspace label)")
     .action((name: string) => {
       const entry = listWorkspaceFiles(loadRc()).find(

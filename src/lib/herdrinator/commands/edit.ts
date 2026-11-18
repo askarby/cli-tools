@@ -7,7 +7,7 @@ import { findWorkspaceFile } from "../workspace.ts";
 export const register = (program: Command): void => {
   program
     .command("edit")
-    .description("📝 Open a workspace file in your editor")
+    .description("Open a workspace file in your editor")
     .argument("<name>", "workspace file name, without extension")
     .action((name: string) => {
       const rc = loadRc();

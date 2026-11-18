@@ -42,7 +42,7 @@ export const defaultDeps: Deps = { exec: execHerdr };
 
 const spec: CliSpec<Deps> = {
   name: "herdrinator",
-  description: "🐑 tmuxinator-style workspaces for herdr",
+  description: "tmuxinator-style workspaces for herdr",
   helpText: EXAMPLES,
   registrars: REGISTRARS,
 };

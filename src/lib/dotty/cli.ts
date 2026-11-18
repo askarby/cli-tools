@@ -24,12 +24,12 @@ ${c.bold("Examples:")}
 
 const NOTES = `
 ${c.bold("Good to know:")}
-  🔗 One symlink per file (no stow-style directory folding); real directories are created
-  🛑 Conflicts are never overwritten: if any file is in the way, link changes nothing
-  🧯 Nothing is ever deleted: adopt/sync rename into the repo, drop moves to <repo>/.dotty-trash
-  🔒 adopt is always interactive; sync/drop need a TTY or --yes; adopt refuses .ssh, .gnupg, .git and node_modules
-  🔍 sync only scans folders at least two levels deep (e.g. ~/.config/nvim, never ~/.config)
-  🧪 link, unlink, adopt, sync and drop all support -n/--dry-run
+  - One symlink per file (no stow-style directory folding); real directories are created
+  - Conflicts are never overwritten: if any file is in the way, link changes nothing
+  - Nothing is ever deleted: adopt/sync rename into the repo, drop moves to <repo>/.dotty-trash
+  - adopt is always interactive; sync/drop need a TTY or --yes; adopt refuses .ssh, .gnupg, .git and node_modules
+  - sync only scans folders at least two levels deep (e.g. ~/.config/nvim, never ~/.config)
+  - link, unlink, adopt, sync and drop all support -n/--dry-run
 `;
 
 /** Everything interactive, injectable for tests. */
@@ -45,7 +45,7 @@ export const defaultDeps: Deps = {
 
 const spec: CliSpec<Deps> = {
   name: "dotty",
-  description: "🌿 a stow-style dotfiles manager",
+  description: "a stow-style dotfiles manager",
   helpText: EXAMPLES + NOTES,
   registrars: [init, link, unlink, list, adopt, sync, drop, doctor],
 };

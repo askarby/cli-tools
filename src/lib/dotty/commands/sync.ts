@@ -106,7 +106,7 @@ interface Opts {
 export const register = (program: Command, deps: Deps): void => {
   program
     .command("sync")
-    .description("🔄 Pull live changes and new files back into the repo")
+    .description("Pull live changes and new files back into the repo")
     .argument("[packages...]", "packages to sync (default: all)")
     .option("-y, --yes", "accept every change without asking")
     .option("-n, --dry-run", "show what would happen, change nothing")

@@ -12,7 +12,7 @@ export const register = (program: Command): void => {
     .command("new")
     .alias("init")
     .description(
-      "✨ Create a new workspace file (comments only, explaining how to fill it in)",
+      "Create a new workspace file (comments only, explaining how to fill it in)",
     )
     .argument("<name>", "workspace file name, without extension")
     .action((name: string) => {

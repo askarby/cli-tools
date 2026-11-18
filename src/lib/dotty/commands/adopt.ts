@@ -177,7 +177,7 @@ export const register = (program: Command, deps: Deps): void => {
   program
     .command("adopt")
     .description(
-      "📥 Move files and directories into a package and link them back (interactive)",
+      "Move files and directories into a package and link them back (interactive)",
     )
     .option("-n, --dry-run", "show what would happen, change nothing")
     .addHelpText(

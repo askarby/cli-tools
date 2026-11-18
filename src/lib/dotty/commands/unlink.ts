@@ -15,7 +15,7 @@ interface Opts {
 export const register = (program: Command): void => {
   program
     .command("unlink")
-    .description("🧹 Remove the symlinks of packages (repo files stay put)")
+    .description("Remove the symlinks of packages (repo files stay put)")
     .argument("[packages...]", "packages to unlink")
     .option("-a, --all", "unlink every package")
     .option("-n, --dry-run", "show what would happen, change nothing")

@@ -31,6 +31,7 @@ If an insertion marker is missing it prints the snippet to add by hand.
 - [ ] Tests for every command: happy path, each validation error, `--dry-run` has no effects, idempotency (see `testing`). Destructive code: the `safety` skill's test matrix.
 - [ ] Fill in `src/lib/<name>/AGENTS.md` (purpose, config, quirks) and the README section.
 - [ ] Describe non-obvious behaviour in `--help` text (`addHelpText`), not only in docs.
+- [ ] Command documentation (tool/command descriptions, help text) is plain text: no emojis. Emojis belong only to runtime output via `ui.ts`. `src/lib/shared/cli-docs.test.ts` fails otherwise.
 - [ ] Code that two tools need goes in `src/lib/shared/` and is added to the catalogue below (a test fails if a shared file is missing here).
 - [ ] No new runtime dependency without asking. `install.sh` needs no edit (it links everything in `bin/`).
 - [ ] `npm run check` (format:check + typecheck + lint + tests), then `./install.sh` and run the command by hand.

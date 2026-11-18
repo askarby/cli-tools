@@ -11,7 +11,7 @@ const nameFromCommand = (command: string): string =>
 export const register = (program: Command, deps: Deps): void => {
   const action = program
     .command("action")
-    .description("🎬 Building blocks for scripts running inside herdr");
+    .description("Building blocks for scripts running inside herdr");
 
   action
     .command("workspace")

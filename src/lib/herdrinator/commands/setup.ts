@@ -19,7 +19,7 @@ export const register = (program: Command): void => {
   program
     .command("setup")
     .description(
-      "🔧 Create the base herdrinatorrc.toml and an example workspace (bob.yml)",
+      "Create the base herdrinatorrc.toml and an example workspace (bob.yml)",
     )
     .action(() => {
       const workspaces = defaultWorkspacesDir();

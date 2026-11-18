@@ -12,7 +12,7 @@ type Check = [ok: boolean | "warn", message: string];
 export const register = (program: Command): void => {
   program
     .command("doctor")
-    .description("🩺 Check the config, the repo and every link for problems")
+    .description("Check the config, the repo and every link for problems")
     .action(() => {
       const checks: Check[] = [];
       try {

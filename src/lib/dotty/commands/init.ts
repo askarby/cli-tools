@@ -10,7 +10,7 @@ import { configPath, expandHome, tildify } from "../paths.ts";
 export const register = (program: Command, deps: Deps): void => {
   program
     .command("init")
-    .description("🌱 Create the config file pointing at your dotfiles repo")
+    .description("Create the config file pointing at your dotfiles repo")
     .option("-r, --repo <path>", "local path of the dotfiles repository")
     .option("-t, --target <dir>", "directory to link into (default: $HOME)")
     .action(async (opts: { repo?: string; target?: string }) => {

@@ -20,7 +20,7 @@ const attempt = (fn: () => string): Check => {
 export const register = (program: Command, deps: Deps): void => {
   program
     .command("doctor")
-    .description("🩺 Check herdr, configuration and workspace files")
+    .description("Check herdr, configuration and workspace files")
     .action(() => {
       const checks: Check[] = [];
       checks.push(attempt(() => deps.exec(["--version"]).trim()));

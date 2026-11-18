@@ -15,7 +15,7 @@ interface Options {
 export const register = (program: Command, deps: Deps): void => {
   program
     .command("start")
-    .description("🚀 Start a workspace from its configuration file")
+    .description("Start a workspace from its configuration file")
     .argument("<name>", "workspace file name, without extension")
     .option("--no-focus", "do not focus the workspace once built")
     .option("--dry-run", "print the herdr calls without running anything")

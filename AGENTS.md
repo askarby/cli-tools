@@ -53,6 +53,7 @@ Task-specific guidance lives in `.agents/skills/<name>/SKILL.md`. Read the relev
 - All file deletion in TypeScript goes through `safeRemove` in `src/lib/shared/safety.ts` (or `safeUnlink` for removing symlinks that point into a given root, e.g. `dotty`); never call `rmSync`/`unlink` directly. Read the `safety` skill first.
 - Tests never touch the real home, config or `~/.bin`, and never run the real `herdr`; use `createSandbox()` and fakes (see `testing`).
 - Keep `bin/` to executables only.
+- No emojis in command documentation: tool and command descriptions, `--help`/help text, and the docs describing commands. Emojis are only allowed in runtime output (`src/lib/shared/ui.ts` helpers, status pills). `src/lib/shared/cli-docs.test.ts` enforces this for every tool.
 - Don't commit unless asked.
 
 ## Working notes

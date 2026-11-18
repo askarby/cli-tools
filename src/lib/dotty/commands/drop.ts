@@ -20,7 +20,7 @@ export const register = (program: Command, deps: Deps): void => {
   program
     .command("drop")
     .description(
-      "🗑️  Unlink a package and move it out of the repo into .dotty-trash",
+      "Unlink a package and move it out of the repo into .dotty-trash",
     )
     .argument("<package>", "package to drop")
     .option("-y, --yes", "don't ask for confirmation")
