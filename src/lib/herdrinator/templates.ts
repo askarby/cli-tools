@@ -14,7 +14,7 @@ workspaces_dir = "${workspacesDir}"
 
 # Extra directories to search after workspaces_dir (first match wins).
 # Handy for sharing workspace files between machines or keeping some in a repo.
-# extra_dirs = ["~/dotfiles/herdrinator", "~/work/workspaces"]
+# extra_dirs = ["~/shared/herdrinator", "~/work/workspaces"]
 
 # Editor used by \`herdrinator edit <name>\`. When empty, $VISUAL and then
 # $EDITOR are used. Arguments are allowed, e.g. "code --wait".

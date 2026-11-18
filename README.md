@@ -63,6 +63,24 @@ A stow-style dotfiles manager (no stow involved). The repo is a set of _packages
 
 Config (`$XDG_CONFIG_HOME/dotty/config.toml`): `repo` (local path, required), `target` (default `$HOME`), `ignore` (name globs). Differences from stow: no directory "folding" (real directories, one link per file), conflicts are never overwritten, and nothing is ever deleted (`drop` moves to `.dotty-trash`; links are removed with `safeUnlink`). `link`/`unlink`/`adopt`/`sync`/`drop` all support `--dry-run`; `adopt` is always interactive; `sync`/`drop` need a TTY or `--yes`.
 
+## aliaz
+
+Shell alias manager: one TOML file with groups and descriptions, discoverable with `list` and `search`, and turned into a sourceable file for sh, bash, zsh and fish.
+
+| Command                         | What it does                                                          |
+| ------------------------------- | --------------------------------------------------------------------- |
+| `aliaz init`                    | create `config.toml` and an empty `aliases.toml`                      |
+| `aliaz add`                     | add an alias, a directory rule or a function (interactive or flags)   |
+| `aliaz list` / `search <words>` | show aliases with state; find by name, description or command         |
+| `aliaz remove <name>`           | remove an alias or function (`--yes` when not on a TTY)               |
+| `aliaz sync`                    | rescan rule directories and regenerate the files (`--dry-run`)        |
+| `aliaz generate [shell]`        | write (or `--stdout` print) the sourceable file                       |
+| `aliaz edit` / `doctor`         | edit the file in `$EDITOR`; check config, aliases and generated files |
+
+Config (`$XDG_CONFIG_HOME/aliaz/config.toml`, optional): `aliases_file` (default `<config dir>/aliases.toml`) and `shells` (default zsh, bash, fish). Source the generated file from your shell rc, e.g. `source ~/.local/state/aliaz/aliases.zsh`; aliaz never runs at shell start, so startup stays fast.
+
+`aliases.toml` has plain aliases (`[git.gs]` with `command`, `description`), directory rules (`[[mux.expand]]`: one alias per entry, refreshed by `aliaz sync`) and functions (`[[code.function]]`: `proj <entry>` with tab completion, always current). Commands that change the file rewrite it, so comments are not kept; use `aliaz edit` to keep them.
+
 ## Scripts
 
 `npm run typecheck`, `npm run lint`, `npm run format`

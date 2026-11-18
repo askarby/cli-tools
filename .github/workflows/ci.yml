@@ -36,6 +36,14 @@ jobs:
       test-paths: src/lib/dotty
       smoke-args: --help
 
+  aliaz:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: aliaz
+      lint-paths: src/tools/aliaz.ts src/lib/aliaz
+      test-paths: src/lib/aliaz
+      smoke-args: --help
+
   shared:
     uses: ./.github/workflows/tool-pipeline.yml
     with:

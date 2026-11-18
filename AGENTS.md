@@ -54,6 +54,7 @@ Task-specific guidance lives in `.agents/skills/<name>/SKILL.md`. Read the relev
 - Tests never touch the real home, config or `~/.bin`, and never run the real `herdr`; use `createSandbox()` and fakes (see `testing`).
 - Keep `bin/` to executables only.
 - No emojis in command documentation: tool and command descriptions, `--help`/help text, and the docs describing commands. Emojis are only allowed in runtime output (`src/lib/shared/ui.ts` helpers, status pills). `src/lib/shared/cli-docs.test.ts` enforces this for every tool.
+- Tools are independent of how their config is stored. Only `dotty` may know about dotfiles managers: no other tool's code, tests, help or docs under `src/lib/<tool>/` may mention `dotty`, `stow` or "dotfiles", or assume its config is checked into a repository or symlinked. Tools just read and write their XDG paths. `src/lib/shared/tool-independence.test.ts` enforces this.
 - Don't commit unless asked.
 
 ## Working notes
