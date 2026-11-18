@@ -2,7 +2,7 @@
 
 Notes for working in `src/lib/dotty/`. Read before touching the tool.
 
-`dotty` is a stow-style dotfiles manager (it never calls stow). Entry: `src/tools/dotty.ts` (thin). User docs: `dotty --help` ("Good to know") and the README.
+`dotty` is a stow-style dotfiles manager (it never calls stow). Entry: `src/tools/dotty.ts` (thin). User docs: `dotty --help` ("Good to know"); `README.md` here is a short intro only.
 
 - `config.ts` (`$XDG_CONFIG_HOME/dotty/config.toml`: `repo`, `target`, `ignore`), `paths.ts`, `packages.ts` (scan repo into packages/entries), `inspect.ts` (per-link state: linked/missing/conflict/broken/foreign; orphans), `planner.ts` (pure: what should happen), `apply.ts` (does it; removal via `safeUnlink`), `repo-ops.ts` (`adoptFile`: rename into repo, link back), `ui.ts` (state pills, action table), `commands/*` (one `register(program, deps)` per subcommand).
 - `cli.ts` is a `CliSpec` wrapped around `src/lib/shared/cli.ts`. `Deps = { prompts, isInteractive }` is injected; `prompts.ts` re-exports `src/lib/shared/prompts.ts`. Tests use `test-harness.ts` (wraps the shared `createHarness`, adds `repo`, `repoFile`, `dotty`).

@@ -21,7 +21,8 @@ Name: lowercase letters, digits and `-`, starting with a letter. It refuses to o
 - `src/lib/<name>/commands/hello.ts`: example command; replace it
 - `src/lib/<name>/commands.test.ts`: command-level test using the shared harness
 - `src/lib/<name>/AGENTS.md`: per-tool notes stub; fill it in
-- inserts the CI job (`.github/workflows/ci.yml`, before `shared:`) and a README stub (before `## Scripts`)
+- `src/lib/<name>/README.md`: short intro page stub (what and why, requirements, config location; commands and options belong in `--help`, not here)
+- inserts the CI job (`.github/workflows/ci.yml`, before `shared:`) and a row in the root README's tools table (before the `<!-- tools:end -->` marker; run `npm run format` afterwards so Prettier realigns the table)
 
 If an insertion marker is missing it prints the snippet to add by hand.
 
@@ -29,7 +30,7 @@ If an insertion marker is missing it prints the snippet to add by hand.
 
 - [ ] Replace the example command; one `register(program, deps)` per subcommand in `commands/`.
 - [ ] Tests for every command: happy path, each validation error, `--dry-run` has no effects, idempotency (see `testing`). Destructive code: the `safety` skill's test matrix.
-- [ ] Fill in `src/lib/<name>/AGENTS.md` (purpose, config, quirks) and the README section.
+- [ ] Fill in `src/lib/<name>/AGENTS.md` (purpose, config, quirks), `src/lib/<name>/README.md` and the one-line summary in the root README's tools table.
 - [ ] Describe non-obvious behaviour in `--help` text (`addHelpText`), not only in docs.
 - [ ] Command documentation (tool/command descriptions, help text) is plain text: no emojis. Emojis belong only to runtime output via `ui.ts`. `src/lib/shared/cli-docs.test.ts` fails otherwise.
 - [ ] Don't mention `dotty`/`stow`/"dotfiles" or assume your config is versioned or symlinked: only `dotty` knows about that. `src/lib/shared/tool-independence.test.ts` fails otherwise.

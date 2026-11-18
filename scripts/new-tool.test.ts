@@ -15,7 +15,8 @@ import { scaffold } from "./new-tool.ts";
 
 const REPO = resolve(import.meta.dirname, "..");
 const CI = "jobs:\n  hello:\n    uses: x\n\n  shared:\n    uses: y\n";
-const README = "# cli-tools\n\n## Testing\n\n## Scripts\n";
+const README =
+  "# cli-tools\n\n## Tools\n\n| Tool | What |\n| --- | --- |\n| [hello](src/lib/hello/README.md) | hi |\n\n<!-- tools:end -->\n\n## More\n";
 
 let sandbox: Sandbox;
 let root: string;
@@ -43,6 +44,7 @@ describe("scaffold", () => {
       "src/lib/demo/commands/hello.ts",
       "src/lib/demo/commands.test.ts",
       "src/lib/demo/AGENTS.md",
+      "src/lib/demo/README.md",
     ]);
     expect(statSync(join(root, "bin/demo")).mode & 0o111).not.toBe(0);
     expect(read("bin/demo")).toContain('run_tool demo "$@"');
@@ -66,7 +68,7 @@ describe("scaffold", () => {
     }
   });
 
-  it("inserts the CI job before `shared:` and a README stub before `## Scripts`", () => {
+  it("inserts the CI job before `shared:` and a tools table row before the marker", () => {
     const result = scaffold("demo", { root });
     expect(result.inserted).toEqual([".github/workflows/ci.yml", "README.md"]);
     const ci = read(".github/workflows/ci.yml");
@@ -74,12 +76,23 @@ describe("scaffold", () => {
     expect(ci.indexOf("  demo:")).toBeLessThan(ci.indexOf("  shared:"));
     expect(ci).toContain("lint-paths: src/tools/demo.ts src/lib/demo");
     const readme = read("README.md");
-    expect(readme.indexOf("## demo")).toBeLessThan(
-      readme.indexOf("## Scripts"),
+    const row = "| [demo](src/lib/demo/README.md) |";
+    expect(readme).toContain(row);
+    expect(readme.indexOf(row)).toBeGreaterThan(readme.indexOf("[hello]"));
+    expect(readme.indexOf(row)).toBeLessThan(
+      readme.indexOf("<!-- tools:end -->"),
     );
-    expect(readme.indexOf("## demo")).toBeGreaterThan(
-      readme.indexOf("## Testing"),
-    );
+    // the new row continues the table: no blank line between rows
+    expect(readme).toMatch(/\| hi \|\n\| \[demo\]/);
+  });
+
+  it("creates a tool README that points at --help and has no emojis", () => {
+    scaffold("demo", { root });
+    const readme = read("src/lib/demo/README.md");
+    expect(readme).toContain("# demo");
+    expect(readme).toContain("`demo --help`");
+    expect(readme).not.toContain("__NAME__");
+    expect(readme).not.toMatch(/\p{Extended_Pictographic}/u);
   });
 
   it("is not repeatable: a second run refuses and changes nothing", () => {
@@ -101,7 +114,7 @@ describe("scaffold", () => {
   it("--dry-run reports the plan and writes nothing", () => {
     const result = scaffold("demo", { root, dryRun: true });
     expect(result.dryRun).toBe(true);
-    expect(result.created).toHaveLength(6);
+    expect(result.created).toHaveLength(7);
     expect(existsSync(join(root, "bin/demo"))).toBe(false);
     expect(existsSync(join(root, "src"))).toBe(false);
     expect(read(".github/workflows/ci.yml")).toBe(CI);
@@ -113,7 +126,7 @@ describe("scaffold", () => {
     expect(result.inserted).toEqual([".github/workflows/ci.yml"]);
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]).toContain("README.md");
-    expect(result.warnings[0]).toContain("## demo");
+    expect(result.warnings[0]).toContain("[demo](src/lib/demo/README.md)");
     expect(existsSync(join(root, "bin/demo"))).toBe(true);
     expect(read("README.md")).toBe("# nothing useful\n");
   });

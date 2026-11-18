@@ -2,6 +2,8 @@
 
 TypeScript CLI tools for personal development machines. Each command is a TypeScript file run directly with [tsx](https://tsx.is) (no build step), started through a thin bash launcher that is symlinked into `~/.bin`.
 
+Human-facing docs: `README.md` (overview and getting started), `CONTRIBUTING.md` (how to contribute, tooling), `LLM.md` (how AI is used here). Each tool has an intro page at `src/lib/<tool>/README.md`, linked from the root README's tools table.
+
 ## Stack
 
 - Node.js, ESM TypeScript (`"type": "module"`), run with repo-local `tsx`.
@@ -62,5 +64,5 @@ Task-specific guidance lives in `.agents/skills/<name>/SKILL.md`. Read the relev
 - `ls` may be aliased in the maintainer's shell and reject paths: use `git ls-files` (or the Glob/Read tools) to list files.
 - Bash `cd` persists between calls: use absolute paths.
 - New tool: read the `new-tool` skill and run the generator. Don't spawn an exploration agent to learn conventions; they are written down.
-- Document behaviour users must know in the tool's `--help` text and its `src/lib/<tool>/AGENTS.md`, not only the README.
+- Document behaviour users must know in the tool's `--help` text and its `src/lib/<tool>/AGENTS.md`. The tool's `src/lib/<tool>/README.md` is a short introduction only (what and why, requirements, config location): don't repeat command or option reference from `--help` there.
 - Temp files and scratch repos go in the session scratchpad, not `/tmp` or the repo.

@@ -2,7 +2,7 @@
 
 Notes for working in `src/lib/aliaz/`. Read before touching the tool.
 
-`aliaz` manages shell aliases: a TOML file in, cached sourceable files out. Entry: `src/tools/aliaz.ts` (thin). User docs: `aliaz --help` ("Good to know") and the README.
+`aliaz` manages shell aliases: a TOML file in, cached sourceable files out. Entry: `src/tools/aliaz.ts` (thin). User docs: `aliaz --help` ("Good to know"); `README.md` here is a short intro only.
 
 - Config: `$XDG_CONFIG_HOME/aliaz/config.toml` (optional; `aliases_file`, `shells`; `config.ts`). Aliases file: `aliases.toml` next to it (`store.ts`). Generated files: `$XDG_STATE_HOME/aliaz/aliases.<shell>` (`generate.ts`).
 - Data flow: `store.ts` parses the file into a `Spec` (plain aliases, expand rules, function rules); `expand.ts` `materialize()` scans directories and returns a `Model` (what is rendered, shown and wrong); `shells/render.ts` turns a `Model` into text per shell; `resolve.ts` classifies rows (active, shadowed, broken). Commands load via `context.ts` and mutate the `Spec` (never the `Model`), then call `persist.ts`.

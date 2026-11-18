@@ -33,7 +33,7 @@ Use the `new-tool` skill: `npm run new-tool -- <name>` scaffolds everything belo
 2. Copy `bin/hello` to `bin/<name>` (add `require_command <tool> <hint>` before `run_tool` if the command needs an external tool; the check is skipped for `--help`, so the tool must handle `--help` itself) and change the last line to `run_tool <name> "$@"`. `chmod +x bin/<name>`.
 3. Add tests next to the lib code (`testing` skill).
 4. Add a job for it in `.github/workflows/ci.yml` (`tool-pipeline.yml`: `tool`, `lint-paths`, `test-paths`, `smoke-args: --help`).
-5. Add a README section and `src/lib/<name>/AGENTS.md`.
+5. Add `src/lib/<name>/README.md` (short intro), `src/lib/<name>/AGENTS.md`, and a row in the root README's tools table (above `<!-- tools:end -->`).
 6. Run `npm run check`, then `./install.sh` and try the command.
 
 Put code used by more than one command in `src/lib/shared/`, not in a tool file. Put launcher logic shared by all commands in `shell/_common.sh`, not in individual launchers.

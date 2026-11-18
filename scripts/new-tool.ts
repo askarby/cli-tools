@@ -11,7 +11,7 @@ import { parseArgs } from "node:util";
 import { CliError } from "../src/lib/shared/errors.ts";
 import { c, hint, ok, say, step, warn } from "../src/lib/shared/ui.ts";
 
-/** Scaffolds a new tool: launcher, entrypoint, commander skeleton, test, CI job, README stub. */
+/** Scaffolds a new tool: launcher, entrypoint, commander skeleton, test, notes, README, CI job, README table row. */
 
 const NAME = /^[a-z][a-z0-9-]*$/;
 const RESERVED = new Set(["shared", "scripts", "tools"]);
@@ -125,10 +125,24 @@ const CI_JOB = `  __NAME__:
 
 `;
 
-const README_SECTION = `## __NAME__
+const TOOL_README = `# __NAME__
 
-TODO: describe what __NAME__ does and its commands.
+TODO: what __NAME__ is and why it exists, in a few sentences.
 
+## Requirements
+
+TODO: what must be installed (or remove this section).
+
+## Where things live
+
+TODO: config and state locations.
+
+## Usage
+
+See \`__NAME__ --help\` (and \`__NAME__ <command> --help\`) for commands and options.
+`;
+
+const README_ROW = `| [__NAME__](src/lib/__NAME__/README.md) | TODO: one-line summary |
 `;
 
 export interface ScaffoldOptions {
@@ -157,7 +171,7 @@ const fill = (template: string, name: string): string =>
   template.replaceAll("__NAME__", name);
 
 /**
- * Creates the tool's files and inserts its CI job and README stub. Never
+ * Creates the tool's files and inserts its CI job and tools table row. Never
  * overwrites or deletes: if any target exists nothing is written.
  */
 export const scaffold = (
@@ -184,6 +198,7 @@ export const scaffold = (
     { rel: `src/lib/${name}/commands/hello.ts`, content: HELLO },
     { rel: `src/lib/${name}/commands.test.ts`, content: fill(TEST, name) },
     { rel: `src/lib/${name}/AGENTS.md`, content: fill(TOOL_AGENTS, name) },
+    { rel: `src/lib/${name}/README.md`, content: fill(TOOL_README, name) },
   ];
   const existing = files.filter((f) => existsSync(join(root, f.rel)));
   if (existing.length > 0) {
@@ -193,7 +208,13 @@ export const scaffold = (
     );
   }
 
-  const inserts: { rel: string; marker: string; text: string }[] = [
+  const inserts: {
+    rel: string;
+    marker: string;
+    text: string;
+    /** Insert right after the preceding content instead of at the marker (Prettier keeps a blank line before the marker). */
+    afterPrevious?: boolean;
+  }[] = [
     {
       rel: ".github/workflows/ci.yml",
       marker: "  shared:\n",
@@ -201,16 +222,20 @@ export const scaffold = (
     },
     {
       rel: "README.md",
-      marker: "## Scripts",
-      text: fill(README_SECTION, name),
+      marker: "<!-- tools:end -->",
+      text: fill(README_ROW, name),
+      afterPrevious: true,
     },
   ];
   const warnings: string[] = [];
   const edits = inserts.flatMap((insert) => {
     const path = join(root, insert.rel);
     const current = existsSync(path) ? readFileSync(path, "utf8") : "";
-    const at = current.indexOf(insert.marker);
-    if (at === -1) {
+    const found = current.indexOf(insert.marker);
+    const at = insert.afterPrevious
+      ? current.slice(0, found).trimEnd().length + 1
+      : found;
+    if (found === -1) {
       warnings.push(
         `${insert.rel}: marker ${JSON.stringify(insert.marker.trim())} not found; add this by hand:\n${insert.text}`,
       );
@@ -270,12 +295,15 @@ const main = (argv: string[]): void => {
   say(
     "  1. Replace the example command; fill in src/lib/" +
       name +
-      "/AGENTS.md and the README stub",
+      "/AGENTS.md and README.md, and the table row in README.md",
   );
   say(
     "  2. Reuse src/lib/shared/ (see the new-tool skill); ask before adding dependencies",
   );
-  say("  3. npm run check, then ./install.sh and try ./bin/" + name);
+  say(
+    "  3. npm run format (realigns the README table), npm run check, then ./install.sh and try ./bin/" +
+      name,
+  );
 };
 
 if (
