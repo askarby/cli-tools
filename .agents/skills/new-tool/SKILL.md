@@ -54,5 +54,5 @@ Import with the `.ts` extension, e.g. `import { c, ok } from "../shared/ui.ts"`.
 - Config in `$XDG_CONFIG_HOME/<tool>/config.toml` with validation to `CliError`: `src/lib/dotty/config.ts` (`smol-toml`; use `||` not `??` for env fallbacks).
 - Plan/apply split with `--dry-run`: `src/lib/dotty/planner.ts` and `apply.ts`.
 - Status table with pills, and a doctor-style check list (✅/⚠️/❌, exit 1 on failure): `src/lib/dotty/commands/list.ts`, `doctor.ts`; `src/lib/herdrinator/commands/doctor.ts`.
-- Guided prompts with a non-interactive escape hatch (`--yes`, flags for every answer): `src/lib/dotty/commands/adopt.ts`.
+- Multi-step guided prompts (select, multiselect, path, confirm): `src/lib/dotty/commands/adopt.ts`.
 - Wrapping an external binary with an injectable `exec`: `src/lib/herdrinator/herdr.ts`.

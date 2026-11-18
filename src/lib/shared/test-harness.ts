@@ -136,17 +136,21 @@ export interface FakePrompts extends Prompts {
 }
 
 /** Scripted answers, consumed in order. Throws if the tool asks more than expected. */
-export const fakePrompts = (answers: (string | boolean)[]): FakePrompts => {
+export const fakePrompts = (
+  answers: (string | boolean | string[])[],
+): FakePrompts => {
   const asked: string[] = [];
-  const next = (message: string): string | boolean => {
+  const next = (message: string): string | boolean | string[] => {
     asked.push(message);
     if (answers.length === 0) throw new Error(`unexpected prompt: ${message}`);
-    return answers.shift() as string | boolean;
+    return answers.shift() as string | boolean | string[];
   };
   return {
     asked,
     text: async ({ message }) => next(message) as string,
     confirm: async (message) => next(message) as boolean,
     select: async (message) => next(message) as never,
+    multiselect: async (message) => next(message) as never,
+    path: async (message) => next(message) as string,
   };
 };

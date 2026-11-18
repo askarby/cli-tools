@@ -16,6 +16,12 @@ export interface Prompts {
   }): Promise<string>;
   confirm(message: string): Promise<boolean>;
   select<T extends string>(message: string, choices: Choice<T>[]): Promise<T>;
+  multiselect<T extends string>(
+    message: string,
+    choices: Choice<T>[],
+  ): Promise<T[]>;
+  /** A filesystem path with tab completion, starting at `root`. */
+  path(message: string, root: string): Promise<string>;
 }
 
 const answer = <T>(value: T | symbol): T => {
@@ -45,4 +51,18 @@ export const clackPrompts: Prompts = {
         })),
       }),
     ) as never,
+  multiselect: async (message, choices) =>
+    answer<string[]>(
+      await clack.multiselect<string>({
+        message,
+        required: false,
+        options: choices.map((c) => ({
+          value: c.value,
+          label: c.label,
+          ...(c.hint ? { hint: c.hint } : {}),
+        })),
+      }),
+    ) as never,
+  path: async (message, root) =>
+    answer<string>(await clack.path({ message, root })),
 };

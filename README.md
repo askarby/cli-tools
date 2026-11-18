@@ -56,12 +56,12 @@ A stow-style dotfiles manager (no stow involved). The repo is a set of _packages
     dotty link --all                # symlink every package (or: dotty link zsh git)
     dotty unlink zsh                # remove a package's links; repo files stay
     dotty list                      # LINKED / PARTIAL / UNLINKED / BROKEN overview (alias: ls)
-    dotty adopt ~/.config/nvim      # guided: move into the repo, link back
+    dotty adopt                     # interactive: pick files (any folder), link back
     dotty sync                      # pull live edits and new files into the repo
     dotty drop zsh                  # unlink, then move the package to <repo>/.dotty-trash
     dotty doctor                    # find broken, orphaned or conflicting links
 
-Config (`$XDG_CONFIG_HOME/dotty/config.toml`): `repo` (local path, required), `target` (default `$HOME`), `ignore` (name globs). Differences from stow: no directory "folding" (real directories, one link per file), conflicts are never overwritten, and nothing is ever deleted (`drop` moves to `.dotty-trash`; links are removed with `safeUnlink`). `link`/`unlink`/`adopt`/`sync`/`drop` all support `--dry-run`; destructive or interactive commands need a TTY or `--yes`.
+Config (`$XDG_CONFIG_HOME/dotty/config.toml`): `repo` (local path, required), `target` (default `$HOME`), `ignore` (name globs). Differences from stow: no directory "folding" (real directories, one link per file), conflicts are never overwritten, and nothing is ever deleted (`drop` moves to `.dotty-trash`; links are removed with `safeUnlink`). `link`/`unlink`/`adopt`/`sync`/`drop` all support `--dry-run`; `adopt` is always interactive; `sync`/`drop` need a TTY or `--yes`.
 
 ## Scripts
 

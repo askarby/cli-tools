@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { normalize } from "./paths.ts";
 import { fakePrompts, createHarness, type Harness } from "./test-harness.ts";
 
 let h: Harness;
@@ -211,60 +212,125 @@ describe("list and doctor", () => {
 });
 
 describe("adopt", () => {
-  it("moves a file into the repo and links it back (flags, non-interactive)", async () => {
-    h.homeFile(".gitconfig", "mine");
-    const out = await h.dotty([
-      "adopt",
-      join(h.home, ".gitconfig"),
-      "-p",
-      "git",
-      "-y",
+  const tty = (answers: (string | boolean | string[])[]) => {
+    const prompts = fakePrompts(answers);
+    return { prompts, isInteractive: () => true };
+  };
+
+  it("adopts files from several folders into one new package", async () => {
+    h.homeFile(".zshrc", "rc");
+    h.homeFile(".config/zsh/aliases.zsh", "al");
+    const t = tty([
+      "zsh", // new package name (repo has no packages, so no select)
+      "add",
+      join(h.home, ".zshrc"),
+      "add",
+      join(h.home, ".config/zsh"),
+      "done",
+      true,
     ]);
-    expect(out).toContain("Adopted 1 file into git");
-    expect(h.read(join(h.repo, "git/.gitconfig"))).toBe("mine");
-    expect(h.linkTarget(join(h.home, ".gitconfig"))).toBe(
-      join(h.repo, "git/.gitconfig"),
-    );
+    const out = await h.dotty(["adopt"], t);
+    expect(out).toContain("Adopted 2 files into zsh");
+    expect(h.read(join(h.repo, "zsh/.zshrc"))).toBe("rc");
+    expect(h.read(join(h.repo, "zsh/.config/zsh/aliases.zsh"))).toBe("al");
+    expect(h.isLink(join(h.home, ".zshrc"))).toBe(true);
+    expect(h.isLink(join(h.home, ".config/zsh/aliases.zsh"))).toBe(true);
   });
 
-  it("walks through the guided prompts and adopts a directory", async () => {
-    h.homeFile(".config/nvim/init.lua", "i");
-    h.homeFile(".config/nvim/lua/a.lua", "a");
-    const prompts = fakePrompts([join(h.home, ".config/nvim"), "nvim", true]);
+  it("merges into an existing package", async () => {
+    h.repoFile("git/.gitconfig", "g");
+    h.homeFile(".config/git/ignore", "i");
+    const out = await h.dotty(
+      ["adopt"],
+      tty(["git", "add", join(h.home, ".config/git/ignore"), "done", true]),
+    );
+    expect(out).toContain("Adopted 1 file into git");
+    expect(h.read(join(h.repo, "git/.config/git/ignore"))).toBe("i");
+    expect(h.read(join(h.repo, "git/.gitconfig"))).toBe("g");
+  });
+
+  it("offers common dotfiles, skipping symlinks, protected and tracked ones", async () => {
+    h.homeFile(".vimrc", "v");
+    h.homeFile(".config/starship.toml", "s");
+    h.homeFile(".ssh/config", "secret");
+    h.repoFile("tracked/.tmux.conf", "t");
+    h.homeFile(".tmux.conf", "t");
+    const picks = [
+      join(h.home, ".vimrc"),
+      join(h.home, ".config/starship.toml"),
+    ];
+    const prompts = fakePrompts([
+      "/new",
+      "tools",
+      "browse",
+      picks,
+      "done",
+      true,
+    ]);
     const out = await h.dotty(["adopt"], {
       prompts,
       isInteractive: () => true,
     });
-    expect(prompts.asked).toHaveLength(3);
-    expect(out).toContain("Step 1/3");
-    expect(out).toContain("Adopted 2 files into nvim");
-    expect(h.isLink(join(h.home, ".config/nvim/lua/a.lua"))).toBe(true);
-    expect(h.read(join(h.repo, "nvim/.config/nvim/lua/a.lua"))).toBe("a");
+    expect(out).toContain("Adopted 2 files into tools");
+    expect(h.isLink(join(h.home, ".ssh/config"))).toBe(false);
+    expect(h.isLink(join(h.home, ".tmux.conf"))).toBe(false);
   });
 
-  it("does nothing when the confirmation is declined", async () => {
-    h.homeFile(".gitconfig", "mine");
-    const prompts = fakePrompts([false]);
+  it("de-duplicates overlapping picks and can remove an item", async () => {
+    h.homeFile(".config/nvim/init.lua", "i");
+    h.homeFile(".gitconfig", "g");
     const out = await h.dotty(
-      ["adopt", join(h.home, ".gitconfig"), "-p", "git"],
-      {
-        prompts,
-        isInteractive: () => true,
-      },
+      ["adopt"],
+      tty([
+        "editor",
+        "add",
+        join(h.home, ".config/nvim"),
+        "add",
+        join(h.home, ".config/nvim/init.lua"),
+        "add",
+        join(h.home, ".gitconfig"),
+        "remove",
+        [normalize(join(h.home, ".gitconfig"))],
+        "done",
+        true,
+      ]),
     );
-    expect(out).toContain("Cancelled");
+    expect(out).toContain("Adopted 1 file into editor");
     expect(h.isLink(join(h.home, ".gitconfig"))).toBe(false);
   });
 
-  it("refuses without --yes when not interactive, and in dry-run changes nothing", async () => {
+  it("keeps going after a bad path", async () => {
+    h.homeFile(".gitconfig", "g");
+    const out = await h.dotty(
+      ["adopt"],
+      tty([
+        "git",
+        "add",
+        join(h.home, "nope"),
+        "add",
+        join(h.home, ".gitconfig"),
+        "done",
+        true,
+      ]),
+    );
+    expect(out).toContain("Not found");
+    expect(out).toContain("Adopted 1 file into git");
+  });
+
+  it("does nothing when declined or in dry-run", async () => {
     h.homeFile(".gitconfig", "mine");
-    expect(
-      await h.dotty(["adopt", join(h.home, ".gitconfig"), "-p", "git"]),
-    ).toContain("--yes");
-    expect(
-      await h.dotty(["adopt", join(h.home, ".gitconfig"), "-p", "git", "-n"]),
-    ).toContain("dry run");
+    const answers = ["git", "add", join(h.home, ".gitconfig"), "done"];
+    expect(await h.dotty(["adopt"], tty([...answers, false]))).toContain(
+      "Cancelled",
+    );
+    expect(await h.dotty(["adopt", "-n"], tty(answers))).toContain("dry run");
     expect(h.isLink(join(h.home, ".gitconfig"))).toBe(false);
+  });
+
+  it("refuses without a terminal", async () => {
+    const out = await h.dotty(["adopt"]);
+    expect(out).toContain("adopt is interactive");
+    expect(process.exitCode).toBe(1);
   });
 
   it.each([
@@ -277,11 +343,6 @@ describe("adopt", () => {
       /already a symlink/,
     ],
     [
-      "a missing path",
-      async (hh: Harness) => join(hh.home, "nope"),
-      /Not found/,
-    ],
-    [
       "outside the target",
       async (hh: Harness) => hh.repoFile("y/f"),
       /not inside|already inside/,
@@ -291,28 +352,30 @@ describe("adopt", () => {
       async (hh: Harness) => hh.homeFile(".ssh/config"),
       /Refusing to adopt anything under \.ssh/,
     ],
-  ])("refuses %s", async (_name, setup, message) => {
+  ])("warns about %s and adopts nothing", async (_name, setup, message) => {
     const path = await setup(h);
-    const out = await h.dotty(["adopt", path, "-p", "pkg", "-y"]);
+    const good = h.homeFile(".good", "g");
+    const out = await h.dotty(
+      ["adopt"],
+      tty(["pkg", "add", path, "add", good, "done", false]),
+    );
     expect(out).toMatch(message);
-    expect(process.exitCode).toBe(1);
+    expect(out).toContain("Cancelled");
+    expect(h.isLink(good)).toBe(false);
   });
 
   it("refuses when the package already has that file, and bad package names", async () => {
     h.repoFile("git/.gitconfig", "repo");
     h.homeFile(".gitconfig", "live");
-    const out = await h.dotty([
-      "adopt",
-      join(h.home, ".gitconfig"),
-      "-p",
-      "git",
-      "-y",
-    ]);
+    const out = await h.dotty(
+      ["adopt"],
+      tty(["git", "add", join(h.home, ".gitconfig"), "done"]),
+    );
     expect(out).toContain("already exist in package 'git'");
     expect(h.read(join(h.home, ".gitconfig"))).toBe("live");
-    expect(
-      await h.dotty(["adopt", join(h.home, ".gitconfig"), "-p", "../x", "-y"]),
-    ).toContain("Invalid package name");
+    h.repoFile("other/f");
+    const bad = await h.dotty(["adopt"], tty(["/new", "../x"]));
+    expect(bad).toContain("Invalid package name");
   });
 });
 

@@ -17,7 +17,7 @@ ${c.bold("Examples:")}
   dotty link --all                     ${c.gray("symlink every package into $HOME")}
   dotty link zsh git -n                ${c.gray("preview linking two packages")}
   dotty list                           ${c.gray("see what is linked")}
-  dotty adopt ~/.config/nvim           ${c.gray("guided: move into the repo, link back")}
+  dotty adopt                          ${c.gray("interactive: pick files, move into a package, link back")}
   dotty sync                           ${c.gray("pull live edits and new files into the repo")}
   dotty doctor                         ${c.gray("find broken or conflicting links")}
 `;
@@ -27,7 +27,7 @@ ${c.bold("Good to know:")}
   🔗 One symlink per file (no stow-style directory folding); real directories are created
   🛑 Conflicts are never overwritten: if any file is in the way, link changes nothing
   🧯 Nothing is ever deleted: adopt/sync rename into the repo, drop moves to <repo>/.dotty-trash
-  🔒 adopt/sync/drop need a TTY or --yes; adopt refuses .ssh, .gnupg, .git and node_modules
+  🔒 adopt is always interactive; sync/drop need a TTY or --yes; adopt refuses .ssh, .gnupg, .git and node_modules
   🔍 sync only scans folders at least two levels deep (e.g. ~/.config/nvim, never ~/.config)
   🧪 link, unlink, adopt, sync and drop all support -n/--dry-run
 `;
