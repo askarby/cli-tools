@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import type { Command } from "commander";
 import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
-import { c, say } from "../ui.ts";
+import { c, say } from "../../shared/ui.ts";
 
 /** "claude ." -> "claude"; "/usr/bin/npm run dev" -> "npm". */
 const nameFromCommand = (command: string): string =>

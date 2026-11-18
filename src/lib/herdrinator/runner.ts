@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { CliError } from "./errors.ts";
+import { CliError } from "../shared/errors.ts";
 import type { Direction, Herdr } from "./herdr.ts";
-import { c, step } from "./ui.ts";
+import { c, step } from "../shared/ui.ts";
 import type { Layout, WindowSpec, WorkspaceSpec } from "./workspace.ts";
 
 interface Split {

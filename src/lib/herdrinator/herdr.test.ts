@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createFakeHerdr } from "./fake-herdr.ts";
-import { CliError } from "./errors.ts";
+import { CliError } from "../shared/errors.ts";
 import { Herdr } from "./herdr.ts";
 
 describe("Herdr", () => {

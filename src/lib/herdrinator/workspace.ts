@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import { parse } from "yaml";
-import { CliError } from "./errors.ts";
+import { CliError } from "../shared/errors.ts";
 import { expandHome } from "./paths.ts";
 import type { Rc } from "./rc.ts";
 

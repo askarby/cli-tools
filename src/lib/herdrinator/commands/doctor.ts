@@ -4,7 +4,7 @@ import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { rcPath } from "../paths.ts";
 import { loadRc } from "../rc.ts";
-import { c, say } from "../ui.ts";
+import { c, say } from "../../shared/ui.ts";
 import { listWorkspaceFiles, loadWorkspace } from "../workspace.ts";
 
 type Check = [ok: boolean | "warn", message: string];

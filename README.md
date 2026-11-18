@@ -7,7 +7,8 @@ TypeScript CLI tools for my development machines. Commands run directly with [ts
 - `bin/` — one executable bash launcher per command (only executables live here)
 - `shell/_common.sh` — shared bash library every launcher sources (not runnable on its own)
 - `src/tools/` — one TypeScript entrypoint per tool
-- `src/lib/` — shared code
+- `src/lib/` — per-tool code, and `src/lib/shared/` for code several tools use
+- `scripts/` — repo-dev scripts (`npm run new-tool`)
 
 ## Install
 
@@ -21,9 +22,9 @@ If you run a launcher before installing dependencies, it tells you what to do.
 
 ## Adding a command
 
-1. Create `src/tools/<name>.ts`.
-2. Copy `bin/hello` to `bin/<name>` and change the last line to `run_tool <name> "$@"`.
-3. `chmod +x bin/<name>`.
+    npm run new-tool -- <name>      # scaffold launcher, entry, lib skeleton, test, CI job, README stub
+
+then follow `.agents/skills/new-tool/SKILL.md`. By hand: create `src/tools/<name>.ts`, copy `bin/hello` to `bin/<name>` (last line `run_tool <name> "$@"`), `chmod +x bin/<name>`.
 
 ## Testing
 
@@ -46,6 +47,21 @@ tmuxinator-style workspaces for [herdr](https://herdr.dev). Workspace files use 
     herdrinator action t "claude ." --name "Claude"     # ... and add a tab to the active one
 
 Run `herdrinator` without arguments for the full usage guide. `start --dry-run` prints the herdr calls without running them. Supported YAML keys: `name`, `root`, `windows` (with `layout`, `root`, `pre`, `panes`), `pre`, `pre_window`, `on_project_start`, `startup_window`; anything else produces a warning. A workspace counts as running when a herdr workspace has the same label as its `name`.
+
+## dotty
+
+A stow-style dotfiles manager (no stow involved). The repo is a set of _packages_: `<repo>/<package>/<path as seen from $HOME>`, e.g. `zsh/.zshrc` or `nvim/.config/nvim/init.lua`.
+
+    dotty init --repo ~/dotfiles    # write ~/.config/dotty/config.toml
+    dotty link --all                # symlink every package (or: dotty link zsh git)
+    dotty unlink zsh                # remove a package's links; repo files stay
+    dotty list                      # LINKED / PARTIAL / UNLINKED / BROKEN overview (alias: ls)
+    dotty adopt ~/.config/nvim      # guided: move into the repo, link back
+    dotty sync                      # pull live edits and new files into the repo
+    dotty drop zsh                  # unlink, then move the package to <repo>/.dotty-trash
+    dotty doctor                    # find broken, orphaned or conflicting links
+
+Config (`$XDG_CONFIG_HOME/dotty/config.toml`): `repo` (local path, required), `target` (default `$HOME`), `ignore` (name globs). Differences from stow: no directory "folding" (real directories, one link per file), conflicts are never overwritten, and nothing is ever deleted (`drop` moves to `.dotty-trash`; links are removed with `safeUnlink`). `link`/`unlink`/`adopt`/`sync`/`drop` all support `--dry-run`; destructive or interactive commands need a TTY or `--yes`.
 
 ## Scripts
 

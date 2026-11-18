@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import type { Command } from "commander";
-import { CliError } from "../errors.ts";
+import { CliError } from "../../shared/errors.ts";
 import { loadRc } from "../rc.ts";
 import { findWorkspaceFile } from "../workspace.ts";
 

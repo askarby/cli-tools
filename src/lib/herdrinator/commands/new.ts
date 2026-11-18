@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Command } from "commander";
-import { CliError } from "../errors.ts";
+import { CliError } from "../../shared/errors.ts";
 import { loadRc } from "../rc.ts";
 import { emptyWorkspace } from "../templates.ts";
-import { c, hint, say } from "../ui.ts";
+import { c, hint, say } from "../../shared/ui.ts";
 import { listWorkspaceFiles } from "../workspace.ts";
 
 export const register = (program: Command): void => {

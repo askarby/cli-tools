@@ -28,10 +28,26 @@ jobs:
       test-paths: src/lib/herdrinator
       smoke-args: --help
 
+  dotty:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: dotty
+      lint-paths: src/tools/dotty.ts src/lib/dotty
+      test-paths: src/lib/dotty
+      smoke-args: --help
+
   shared:
     uses: ./.github/workflows/tool-pipeline.yml
     with:
       tool: shared
       lint-paths: src/lib/shared
       test-paths: src/lib/shared
+      run-build: false
+
+  scripts:
+    uses: ./.github/workflows/tool-pipeline.yml
+    with:
+      tool: scripts
+      lint-paths: scripts
+      test-paths: scripts
       run-build: false

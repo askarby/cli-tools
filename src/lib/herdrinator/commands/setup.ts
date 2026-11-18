@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import type { Command } from "commander";
 import { defaultWorkspacesDir, rcPath } from "../paths.ts";
 import { exampleWorkspace, rcTemplate } from "../templates.ts";
-import { c, hint, say } from "../ui.ts";
+import { c, hint, say } from "../../shared/ui.ts";
 
 const writeOnce = (file: string, content: string): void => {
   if (existsSync(file)) {

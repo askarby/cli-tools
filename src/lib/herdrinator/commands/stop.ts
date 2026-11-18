@@ -1,9 +1,9 @@
 import type { Command } from "commander";
 import type { Deps } from "../cli.ts";
-import { CliError } from "../errors.ts";
+import { CliError } from "../../shared/errors.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
-import { c, say } from "../ui.ts";
+import { c, say } from "../../shared/ui.ts";
 import { listWorkspaceFiles, loadWorkspace } from "../workspace.ts";
 
 export const register = (program: Command, deps: Deps): void => {

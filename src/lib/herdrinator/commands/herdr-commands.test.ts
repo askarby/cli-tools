@@ -1,8 +1,8 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSandbox, type Sandbox } from "../../shared/test-utils.ts";
-import { run } from "../cli.ts";
+import { createHarness, type Harness } from "../../shared/test-harness.ts";
+import { run, type Deps } from "../cli.ts";
 import { createFakeHerdr, type FakeHerdr } from "../fake-herdr.ts";
 import type { WorkspaceInfo } from "../herdr.ts";
 import { defaultWorkspacesDir } from "../paths.ts";
@@ -13,34 +13,22 @@ vi.mock("node:child_process", () => ({
 }));
 const childProcess = await import("node:child_process");
 
-let sandbox: Sandbox;
-let out: ReturnType<typeof vi.spyOn>;
-let err: ReturnType<typeof vi.spyOn>;
+let h: Harness<Deps>;
 
 beforeEach(() => {
-  sandbox = createSandbox();
-  vi.stubEnv("HOME", join(sandbox.work, "home"));
-  vi.stubEnv("XDG_CONFIG_HOME", join(sandbox.work, "config"));
-  vi.stubEnv("HERDRINATOR_WORKSPACE_ID", "");
-  vi.stubEnv("HERDR_WORKSPACE_ID", "");
-  out = vi.spyOn(console, "log").mockImplementation(() => {});
-  err = vi.spyOn(console, "error").mockImplementation(() => {});
+  h = createHarness<Deps>({
+    run,
+    defaultDeps: () => ({ exec: createFakeHerdr().exec }),
+    setup: () => {
+      vi.stubEnv("HERDRINATOR_WORKSPACE_ID", "");
+      vi.stubEnv("HERDR_WORKSPACE_ID", "");
+    },
+  });
 });
-afterEach(() => {
-  process.exitCode = undefined;
-  vi.unstubAllEnvs(); // HOME must not point into the sandbox while it is removed
-  sandbox.cleanup();
-});
+afterEach(() => h.cleanup());
 
-const ANSI = /\u001b\[[0-9;]*m/g;
-const stdout = (): string =>
-  out.mock.calls
-    .map((call: unknown[]) => String(call[0]).replace(ANSI, ""))
-    .join("\n");
-const stderr = (): string =>
-  err.mock.calls
-    .map((call: unknown[]) => String(call[0]).replace(ANSI, ""))
-    .join("\n");
+const stdout = (): string => h.stdout();
+const stderr = (): string => h.stderr();
 
 const workspace = (name: string, body: string): void => {
   mkdirSync(defaultWorkspacesDir(), { recursive: true });
@@ -53,7 +41,7 @@ const go = async (
   existing: Partial<WorkspaceInfo>[] = [],
 ): Promise<FakeHerdr> => {
   const fake = createFakeHerdr(existing);
-  await run(args, { exec: fake.exec });
+  await h.cli(args, { exec: fake.exec });
   return fake;
 };
 const verbs = (fake: FakeHerdr): string[] =>
@@ -180,7 +168,7 @@ describe("doctor", () => {
   });
 
   it("exits 1 when herdr is unavailable", async () => {
-    await run(["doctor"], {
+    await h.cli(["doctor"], {
       exec: createFakeHerdr([], { failWith: new Error("nope") }).exec,
     });
     expect(process.exitCode).toBe(1);

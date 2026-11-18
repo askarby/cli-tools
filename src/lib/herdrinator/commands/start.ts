@@ -3,7 +3,7 @@ import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
 import { buildWorkspace } from "../runner.ts";
-import { c, hint, say, warn } from "../ui.ts";
+import { c, hint, say, warn } from "../../shared/ui.ts";
 import { findWorkspaceFile, loadWorkspace } from "../workspace.ts";
 
 interface Options {

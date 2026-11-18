@@ -28,6 +28,10 @@ A symlink target is removed as a link; its destination is never followed or touc
 
 Do not weaken a check to make a test or feature work. Change the design (a different root, creating the marker when the tool creates the directory) instead.
 
+### Removing symlinks: `safeUnlink`
+
+`safeUnlink(link, { allowedRoot, dryRun? })` is the only sanctioned way to remove a symlink that lives somewhere `safeRemove` cannot be rooted (e.g. in `$HOME`, as `dotty` does). It removes **only symlinks**, never files or directories, and only when the link's target resolves strictly inside `allowedRoot`. `allowedRoot` must exist, not be `/`, shallow, `$HOME` or an ancestor of it, nor sit under a protected name. The link's destination is never followed or touched; dangling links are fine. Tests: `src/lib/shared/safe-unlink.test.ts`.
+
 ### Using it in a command
 
 ```ts

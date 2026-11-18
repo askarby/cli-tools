@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { parse } from "smol-toml";
-import { CliError } from "./errors.ts";
+import { CliError } from "../shared/errors.ts";
 import { defaultWorkspacesDir, expandHome, rcPath } from "./paths.ts";
 
 export interface Rc {

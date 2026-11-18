@@ -1,7 +1,7 @@
-import { Command } from "commander";
-import { CliError } from "./errors.ts";
+import type { Command } from "commander";
+import { buildProgram as build, runCli, type CliSpec } from "../shared/cli.ts";
 import { execHerdr, type Exec } from "./herdr.ts";
-import { c, say } from "./ui.ts";
+import { c } from "../shared/ui.ts";
 import { register as action } from "./commands/action.ts";
 import { register as doctor } from "./commands/doctor.ts";
 import { register as edit } from "./commands/edit.ts";
@@ -40,48 +40,15 @@ export interface Deps {
 
 export const defaultDeps: Deps = { exec: execHerdr };
 
-export const buildProgram = (deps: Deps = defaultDeps): Command => {
-  const program = new Command("herdrinator")
-    .description("🐑 tmuxinator-style workspaces for herdr")
-    .helpOption("-h, --help", "show this help")
-    .showHelpAfterError("(run `herdrinator --help` for usage)")
-    .configureHelp({
-      styleTitle: (title) => c.bold(title),
-      styleCommandText: (text) => c.cyan(text),
-      styleSubcommandText: (text) => c.cyan(text),
-      styleOptionText: (text) => c.green(text),
-      styleArgumentText: (text) => c.yellow(text),
-    })
-    .addHelpText("after", EXAMPLES)
-    .exitOverride();
-  for (const register of REGISTRARS) register(program, deps);
-  return program;
+const spec: CliSpec<Deps> = {
+  name: "herdrinator",
+  description: "🐑 tmuxinator-style workspaces for herdr",
+  helpText: EXAMPLES,
+  registrars: REGISTRARS,
 };
 
-export const run = async (
-  argv: string[],
-  deps: Deps = defaultDeps,
-): Promise<void> => {
-  const args = argv.map((arg) => (arg === "-?" ? "--help" : arg));
-  const program = buildProgram(deps);
-  if (args.length === 0) {
-    program.outputHelp();
-    return;
-  }
-  try {
-    await program.parseAsync(args, { from: "user" });
-  } catch (error) {
-    if (error instanceof CliError) {
-      console.error(`❌ ${error.message}`);
-      if (error.hint) say(`💡 ${c.dim(error.hint)}`);
-      process.exitCode = 1;
-      return;
-    }
-    const code = (error as { code?: string; exitCode?: number }).code;
-    if (code?.startsWith("commander.")) {
-      process.exitCode = (error as { exitCode: number }).exitCode;
-      return;
-    }
-    throw error;
-  }
-};
+export const buildProgram = (deps: Deps = defaultDeps): Command =>
+  build(spec, deps);
+
+export const run = (argv: string[], deps: Deps = defaultDeps): Promise<void> =>
+  runCli(spec, argv, deps);

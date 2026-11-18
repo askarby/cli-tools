@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { CliError } from "./errors.ts";
-import { c, say } from "./ui.ts";
+import { CliError } from "../shared/errors.ts";
+import { c, say } from "../shared/ui.ts";
 
 export interface WorkspaceInfo {
   workspace_id: string;

@@ -31,21 +31,33 @@ For every command, cover: the happy path, each validation error and its exit cod
 
 ## Isolation rules (not optional)
 
-- **Never touch the real machine.** No real `~/.config`, `~/.bin`, repo files, or real `herdr`. A test that needs files uses a sandbox:
+- **Never touch the real machine.** No real `~/.config`, `~/.bin`, repo files, or real `herdr`. For command-level tests use the shared harness, which sandboxes `HOME` and `XDG_CONFIG_HOME`, captures ANSI-stripped output and resets env and `process.exitCode`:
 
   ```ts
-  import { createSandbox, type Sandbox } from "../shared/test-utils.ts";
+  import {
+    createHarness,
+    fakePrompts,
+    type Harness,
+  } from "../shared/test-harness.ts";
+  import { run, type Deps } from "./cli.ts";
 
-  let sandbox: Sandbox;
+  let h: Harness<Deps>;
   beforeEach(() => {
-    sandbox = createSandbox();
-    vi.stubEnv("HOME", sandbox.dir);
-    vi.stubEnv("XDG_CONFIG_HOME", join(sandbox.dir, "config"));
+    h = createHarness<Deps>({
+      run,
+      defaultDeps: () => ({
+        prompts: fakePrompts([]),
+        isInteractive: () => false,
+      }),
+      setup: (h) => h.write(join(h.home, ".config/<tool>/config.toml"), "..."), // optional
+    });
   });
-  afterEach(() => sandbox.cleanup());
+  afterEach(() => h.cleanup());
+
+  it("greets", async () => expect(await h.cli(["hello"])).toContain("Hello"));
   ```
 
-  `createSandbox()` makes a `mkdtemp` directory and cleans it up through `safeRemove`. Do not write raw `rmSync(..., { recursive: true })` in tests; see the `safety` skill.
+  `h.cli(args, deps?)` returns stdout+stderr and resets captured output and `process.exitCode` on each call; `h.stdout()` / `h.stderr()` give the streams of the last call; `deps` override `defaultDeps()` (e.g. `{ exec: fake.exec }`). `fakePrompts([...answers])` scripts interactive answers (and throws on an unexpected prompt); `h.homeFile`, `h.write`, `h.isLink`, `h.linkTarget`, `h.read` cover the filesystem. For tests that don't run the CLI (config loading, paths), use `createEnvironment()` from the same file: the sandboxed home without the runner. See `src/lib/dotty/test-harness.ts` for wrapping it with tool-specific fixtures. For lower-level tests use `createSandbox()` from `test-utils.ts` directly (cleaned through `safeRemove`). Do not write raw `rmSync(..., { recursive: true })` in tests; see the `safety` skill.
 
 - Set env with `vi.stubEnv`, never by assigning `process.env` (stubs are reset automatically). Stub `HOME` **and** `XDG_CONFIG_HOME` before calling code that resolves paths.
 - Reset anything else you change: `process.exitCode = undefined` in `afterEach`, `process.chdir` back, etc.
@@ -75,7 +87,9 @@ Strip ANSI colour before asserting on formatted output. Snapshot only stable, hu
 ## Definition of done
 
 ```
-npm run typecheck && npm run lint && npm test
+npm run check
 ```
+
+(format:check + typecheck + lint + tests, the same chain CI runs.)
 
 New command or lib module without tests is unfinished. A bug fix starts with a failing test that reproduces it.

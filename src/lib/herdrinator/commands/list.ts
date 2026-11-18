@@ -2,7 +2,7 @@ import type { Command } from "commander";
 import type { Deps } from "../cli.ts";
 import { Herdr } from "../herdr.ts";
 import { loadRc } from "../rc.ts";
-import { c, hint, say, table } from "../ui.ts";
+import { c, hint, say, table } from "../../shared/ui.ts";
 import { listWorkspaceFiles, loadWorkspace } from "../workspace.ts";
 
 const STATUS = {

@@ -1,22 +1,17 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSandbox, type Sandbox } from "../shared/test-utils.ts";
-import { CliError } from "./errors.ts";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createEnvironment, type Environment } from "../shared/test-harness.ts";
+import { CliError } from "../shared/errors.ts";
 import { configDir } from "./paths.ts";
 import { loadRc } from "./rc.ts";
 
-let sandbox: Sandbox;
+let env: Environment;
 
 beforeEach(() => {
-  sandbox = createSandbox();
-  vi.stubEnv("HOME", join(sandbox.work, "home"));
-  vi.stubEnv("XDG_CONFIG_HOME", join(sandbox.work, "config"));
+  env = createEnvironment();
 });
-afterEach(() => {
-  vi.unstubAllEnvs(); // HOME must not point into the sandbox while it is removed
-  sandbox.cleanup();
-});
+afterEach(() => env.cleanup());
 
 const writeRc = (text: string): void => {
   mkdirSync(configDir(), { recursive: true });
@@ -40,8 +35,8 @@ describe("loadRc", () => {
     );
     const rc = loadRc();
     expect(rc).toEqual({
-      workspacesDir: join(sandbox.work, "home", "ws"),
-      extraDirs: [join(sandbox.work, "home", "more")],
+      workspacesDir: join(env.home, "ws"),
+      extraDirs: [join(env.home, "more")],
       editor: "vim",
       focus: false,
       fromFile: true,
